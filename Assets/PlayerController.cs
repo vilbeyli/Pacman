@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour {
 	public float speed = 0.4f;
 	Vector2 dest = Vector2.zero;
 
+	static public int score = 0;
+
 	// Use this for initialization
 	void Start () {
 		dest = transform.position;
@@ -35,7 +37,8 @@ public class PlayerController : MonoBehaviour {
 		GetComponent<Animator>().SetFloat("DirX", dir.x);
 		GetComponent<Animator>().SetFloat("DirY", dir.y);
 
-		Debug.Log ("dest: " + dest.x + ", " + dest.y );
+		//Debug.Log ("dest: " + dest.x + ", " + dest.y + " || pos: " + transform.position.x + ", " + transform.position.y);
+		Debug.Log (score);
 	}
 
 	bool valid(Vector2 dir)
@@ -43,7 +46,6 @@ public class PlayerController : MonoBehaviour {
 		// cast line from 'next to pacman' to pacman
 		Vector2 pos = transform.position;
 		RaycastHit2D hit = Physics2D.Linecast(pos+dir, pos);
-		Debug.Log(hit.collider.name);
-		return (hit.collider == collider2D);
+		return hit.collider.name == "pacdot" ? true : (hit.collider == collider2D);
 	}
 }
