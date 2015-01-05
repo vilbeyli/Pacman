@@ -32,13 +32,17 @@ public class PlayerController : MonoBehaviour {
 				dest = (Vector2)transform.position - Vector2.right;
 		}
 
-		// Animation Parameters
+		animate ();
+
+		//Debug.Log ("dest: " + dest.x + ", " + dest.y + " || pos: " + transform.position.x + ", " + transform.position.y);
+		//Debug.Log (score);
+	}
+
+	void animate()
+	{
 		Vector2 dir = dest - (Vector2)transform.position;
 		GetComponent<Animator>().SetFloat("DirX", dir.x);
 		GetComponent<Animator>().SetFloat("DirY", dir.y);
-
-		//Debug.Log ("dest: " + dest.x + ", " + dest.y + " || pos: " + transform.position.x + ", " + transform.position.y);
-		Debug.Log (score);
 	}
 
 	bool valid(Vector2 dir)
