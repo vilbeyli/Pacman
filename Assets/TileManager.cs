@@ -48,14 +48,16 @@ public class TileManager : MonoBehaviour {
 		string path = Application.dataPath + "/Data/tiles.txt";
 		StreamReader stream = new StreamReader(path);
 		
-		// reading tiles from top to bottom. X:2 Y:30 (X goes up, Y goes down)
+		// reading tiles from top to bottom. X:1 Y:31 (X goes up, Y goes down)
 		// so that x and y of tile will be the same as world coordinates.
-		int X = 2, Y = 30;
+		// however, consider the tile map is encapsulated with zeroes, 
+		// therefore X starts from 1 instead of 2 and Y starts from 31 instead of 30. 
+		int X = 1, Y = 31;	
 		while(!stream.EndOfStream)
 		{
 			string line = stream.ReadLine();
 			
-			X = 2;		// for every line
+			X = 1;		// for every line
 			for(int i = 0; i < line.Length ; ++i)
 			{
 				Tile newTile = new Tile(X,Y);
@@ -79,8 +81,8 @@ public class TileManager : MonoBehaviour {
 				// if the current tile is not movable
 				else   newTile.occupied = true;
 				
-				// check for up-down neighbor
-				int upNeighbor = tiles.Count - 26;  // up neighbor index
+				// check for up-down neighbor, starting from second row (Y<30)
+				int upNeighbor = tiles.Count - line.Length;  // up neighbor index
 				if(Y < 30 && !newTile.occupied && !tiles[upNeighbor].occupied)
 				{
 					tiles[upNeighbor].down = newTile;
@@ -105,6 +107,7 @@ public class TileManager : MonoBehaviour {
 			if(tile.adjacentCount > 2)
 				tile.isIntersection = true;
 		}
+
 		stream.Close();
 	}
 	
@@ -133,12 +136,12 @@ public class TileManager : MonoBehaviour {
 	// returns the index in the tiles list of a given tile's coordinates
 	public int Index(int X, int Y)
 	{
-		return (30-Y)*26 + X-2;
+		return (31-Y)*28 + X-1;
 	}
 	
 	public int Index(Tile tile)
 	{
-		return (30-tile.y)*26 + tile.x-2;
+		return (31-tile.y)*28 + tile.x-1;
 	}
 
 	//----------------------------------------------------------------------

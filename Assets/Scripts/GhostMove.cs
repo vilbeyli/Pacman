@@ -4,9 +4,8 @@ using System.Collections;
 public class GhostMove : MonoBehaviour {
 
 	public Transform waypoint;
-	int cur = 0;
 
-	public bool ready = false;
+	public bool AI = false;
 
 	public Vector3 _direction;
 	public Vector3 direction 
@@ -39,13 +38,13 @@ public class GhostMove : MonoBehaviour {
 		if(transform.position != waypoint.position)
 		{
 			//Debug.Log ("WP: " + waypoints[cur].position);
-			ready = false;
+			AI = false;
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint.position, speed);
 			rigidbody2D.MovePosition(p);
 		}
 
 		else {
-			ready = true;
+			AI = true;
 		}
 
 		animate ();
