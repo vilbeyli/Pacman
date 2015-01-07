@@ -3,13 +3,16 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
+	public static int lives = 3;
 	public float speed = 0.4f;
 	Vector2 dest = Vector2.zero;
 
-	static public int score = 0;
+	public static UIScript UI;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
+		UI = GameObject.Find("UI").GetComponent<UIScript>();
 		dest = transform.position;
 	}
 	
@@ -51,5 +54,11 @@ public class PlayerController : MonoBehaviour {
 		Vector2 pos = transform.position;
 		RaycastHit2D hit = Physics2D.Linecast(pos+dir, pos);
 		return hit.collider.name == "pacdot" ? true : (hit.collider == collider2D);
+	}
+
+	static public void LoseLife()
+	{
+		lives--;
+		UI.UpdateLives(lives);
 	}
 }

@@ -34,6 +34,7 @@ public class AI : MonoBehaviour {
 			Vector3 currentPos = new Vector3(transform.position.x + 0.499f, transform.position.y + 0.499f);
 			TileManager.Tile currentTile = tiles[manager.Index ((int)currentPos.x, (int)currentPos.y)];
 
+			//Debug.Log (blinky.direction.x + " " + blinky.direction.y);
 
 			// get the next tile according to direction
 			if(blinky.direction.x > 0)	nextTile = tiles[manager.Index ((int)(currentPos.x+1), (int)currentPos.y)];
@@ -50,16 +51,16 @@ public class AI : MonoBehaviour {
 					// if blinky moves to right or left and there is wall next tile
 					if(blinky.direction.x != 0)
 					{
-						if(currentTile.down == null)	blinky.direction = new Vector3(0, 1, 0);
-						else 							blinky.direction = new Vector3(0, -1, 0);
+						if(currentTile.down == null)	blinky.direction = Vector3.up;
+						else 							blinky.direction = Vector3.down;
 					
 					}
 
 					// if blinky moves to up or down and there is wall next tile
 					else if(blinky.direction.y != 0)
 					{
-						if(currentTile.left == null)	blinky.direction = new Vector3(1, 0, 0); 
-						else 							blinky.direction = new Vector3(-1, 0, 0);
+						if(currentTile.left == null)	blinky.direction = Vector3.right; 
+						else 							blinky.direction = Vector3.left;
 
 					}
 
@@ -73,15 +74,16 @@ public class AI : MonoBehaviour {
 
 					float dist1, dist2, dist3, dist4;
 					dist1 = dist2 = dist3 = dist4 = 999999f;
-					if(currentTile.up != null && !currentTile.up.occupied && !(blinky.direction.y < 0)) dist1 = manager.distance(currentTile.up, targetTile);
-					if(currentTile.down != null && !currentTile.down.occupied &&  !(blinky.direction.y > 0)) dist2 = manager.distance(currentTile.down, targetTile);
-					if(currentTile.left != null && !currentTile.left.occupied && !(blinky.direction.x > 0)) dist3 = manager.distance(currentTile.left, targetTile);
-					if(currentTile.right != null && !currentTile.right.occupied && !(blinky.direction.x < 0)) dist4 = manager.distance(currentTile.right, targetTile);
+					if(currentTile.up != null && !currentTile.up.occupied && !(blinky.direction.y < 0)) 		dist1 = manager.distance(currentTile.up, targetTile);
+					if(currentTile.down != null && !currentTile.down.occupied &&  !(blinky.direction.y > 0)) 	dist2 = manager.distance(currentTile.down, targetTile);
+					if(currentTile.left != null && !currentTile.left.occupied && !(blinky.direction.x > 0)) 	dist3 = manager.distance(currentTile.left, targetTile);
+					if(currentTile.right != null && !currentTile.right.occupied && !(blinky.direction.x < 0))	dist4 = manager.distance(currentTile.right, targetTile);
 
-					if(Mathf.Min(dist1, dist2, dist3, dist4) == dist1) blinky.direction = new Vector3(0, 1, 0);
-					if(Mathf.Min(dist1, dist2, dist3, dist4) == dist2) blinky.direction = new Vector3(0, -1, 0);
-					if(Mathf.Min(dist1, dist2, dist3, dist4) == dist3) blinky.direction = new Vector3(-1, 0, 0);
-					if(Mathf.Min(dist1, dist2, dist3, dist4) == dist4) blinky.direction = new Vector3(1, 0, 0);
+					float min = Mathf.Min(dist1, dist2, dist3, dist4);
+					if(min == dist1) blinky.direction = Vector3.up;
+					if(min == dist2) blinky.direction = Vector3.down;
+					if(min == dist3) blinky.direction = Vector3.left;
+					if(min == dist4) blinky.direction = Vector3.right;
 
 				}
 
@@ -90,7 +92,7 @@ public class AI : MonoBehaviour {
 			// if there is no decision to be made, designate next waypoint for the ghost
 			else
 			{
-				blinky.direction = blinky.direction;	// setter updates waypoint
+				blinky.direction = blinky.direction;	// setter updates the waypoint
 			}
 
 		}
