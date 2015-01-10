@@ -1,4 +1,8 @@
 Pacman-Clone
 ============
 
-A Pacman clone made in Unity - tutorials from [noobtuts](http://noobtuts.com/unity/2d-pacman-game)
+A Pacman clone made in Unity followed tutorials from [noobtuts](http://noobtuts.com/unity/2d-pacman-game). In addition to the tutorial, the original AI is implemented with the help of [Game Internals](http://gameinternals.com/post/2072558330/understanding-pac-man-ghost-behavior) as well as menus, high scores and a few additional levels.
+
+See [Shaunew's Pac-Man](http://pacman.shaunew.com/play/index.htm) to see how each ghost's AI works.
+
+I'll deploy a web player version of the game when it's finished.
