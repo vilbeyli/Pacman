@@ -4,30 +4,62 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
+	//------------------------------------------------------------------
+	// Variable declarations
+
 	private bool paused = false;
 	private bool quit = false;
 
+	// canvas
 	public Canvas PauseCanvas;
 	public Canvas QuitCanvas;
+
+	// buttons
 	public Button MenuButton;
 
-	// Use this for initialization
-	void Start () 
+	//------------------------------------------------------------------
+	// Singleton implementation
+
+
+	//------------------------------------------------------------------
+	// Function Definitions
+	
+	void Awake () 
 	{
 	
 	}
-	
-	// Update is called once per frame
+
 	void Update () 
 	{
-		if(Input.GetKeyDown(KeyCode.Escape))
+		if(Application.loadedLevelName == "game")
 		{
-			if(quit == true)
-				ToggleQuit();
-			else
-				TogglePause();
+			if(Input.GetKeyDown(KeyCode.Escape))
+			{
+				if(quit == true)
+					ToggleQuit();
+				else
+					TogglePause();
+			}
 		}
 	}
+
+	void OnLevelWasLoaded(int level)
+	{
+		switch(level)
+		{
+		case 0:		// menu
+
+			break;
+
+		case 1:		// game
+			paused = quit = false;
+			Time.timeScale = 1.0f;
+			break;
+		}
+	}
+
+	//------------------------------------------------------------------
+	// Button functions
 
 	public void TogglePause()
 	{
@@ -70,5 +102,27 @@ public class GameManager : MonoBehaviour {
 	public void Quit()
 	{
 		Application.Quit();
+	}
+
+	public void Menu()
+	{
+		Application.LoadLevel("menu");
+		Time.timeScale = 1.0f;
+	}
+
+	public void Play()
+	{
+		Application.LoadLevel("game");
+	}
+
+	public void HighScores()
+	{
+		Application.LoadLevel("scores");
+
+	}
+
+	public void SourceCode()
+	{
+		Application.OpenURL("https://github.com/vilbeyli/Pacman-Clone/");
 	}
 }
