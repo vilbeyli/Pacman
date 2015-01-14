@@ -54,8 +54,27 @@ public class Scores : MonoBehaviour {
 			else
 				s += sc.score + "\t" + sc.name + "\n";
 		}
-		//s.Remove(s.Length-1);
 
 		scores_txt.text = s;
+	}
+
+	
+	// reads highest score from file
+	static public int High()
+	{
+
+		// open file
+		string path = Application.dataPath + "/Data/scores.txt";
+		StreamReader stream = new StreamReader(path);
+
+		// read first line and split
+		string line = stream.ReadLine();
+		string[] values = line.Split(' ');
+
+		// close file
+		stream.Close();
+
+		// parse the first value as the highest score
+		return Int32.Parse(values[0]);
 	}
 }

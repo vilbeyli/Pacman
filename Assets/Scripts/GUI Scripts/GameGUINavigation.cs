@@ -1,61 +1,54 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour {
+public class GameGUINavigation : MonoBehaviour {
 
 	//------------------------------------------------------------------
 	// Variable declarations
-
+	
 	private bool paused = false;
 	private bool quit = false;
+	public bool initialWaitOver = false;
+
+	public float initialDelay;
 
 	// canvas
 	public Canvas PauseCanvas;
 	public Canvas QuitCanvas;
-
+	public Canvas ReadyCanvas;
+	
 	// buttons
 	public Button MenuButton;
 
 	//------------------------------------------------------------------
-	// Singleton implementation
-
-
-	//------------------------------------------------------------------
 	// Function Definitions
-	
-	void Awake () 
-	{
-	
-	}
 
+	// Use this for initialization
+	void Start () 
+	{
+		StartCoroutine("ShowReadyScreen", initialDelay);
+	}
+	
+	// Update is called once per frame
 	void Update () 
 	{
-		if(Application.loadedLevelName == "game")
+		if(Input.GetKeyDown(KeyCode.Escape))
 		{
-			if(Input.GetKeyDown(KeyCode.Escape))
-			{
-				if(quit == true)
-					ToggleQuit();
-				else
-					TogglePause();
-			}
+			if(quit == true)
+				ToggleQuit();
+			else
+				TogglePause();
 		}
 	}
 
-	void OnLevelWasLoaded(int level)
+	IEnumerator ShowReadyScreen(float seconds)
 	{
-		switch(level)
-		{
-		case 0:		// menu
-
-			break;
-
-		case 1:		// game
-			paused = quit = false;
-			Time.timeScale = 1.0f;
-			break;
-		}
+		initialWaitOver = false;
+		ReadyCanvas.enabled = true;
+		yield return new WaitForSeconds(seconds);
+		ReadyCanvas.enabled = false;
+		initialWaitOver = true;
 	}
 
 	//------------------------------------------------------------------
@@ -71,7 +64,7 @@ public class GameManager : MonoBehaviour {
 			paused = false;
 			MenuButton.enabled = true;
 		}
-
+		
 		// if not paused before key stroke, pause the game
 		else
 		{
@@ -81,7 +74,7 @@ public class GameManager : MonoBehaviour {
 			MenuButton.enabled = false;
 		}
 	}
-
+	
 	public void ToggleQuit()
 	{
 		if(quit)
@@ -90,7 +83,7 @@ public class GameManager : MonoBehaviour {
 			QuitCanvas.enabled = false;
 			quit = false;
 		}
-
+		
 		else
 		{
 			PauseCanvas.enabled = false;
@@ -99,30 +92,9 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public void Quit()
-	{
-		Application.Quit();
-	}
-
 	public void Menu()
 	{
 		Application.LoadLevel("menu");
 		Time.timeScale = 1.0f;
-	}
-
-	public void Play()
-	{
-		Application.LoadLevel("game");
-	}
-
-	public void HighScores()
-	{
-		Application.LoadLevel("scores");
-
-	}
-
-	public void SourceCode()
-	{
-		Application.OpenURL("https://github.com/vilbeyli/Pacman-Clone/");
 	}
 }

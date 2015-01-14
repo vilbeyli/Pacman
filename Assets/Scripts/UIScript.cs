@@ -17,7 +17,7 @@ public class UIScript : MonoBehaviour {
 		txt_score = GetComponentsInChildren<Text>()[1];
 		txt_high = GetComponentsInChildren<Text>()[0];
 		
-		ReadHighScore();
+		high = Scores.High();
 		score = 0;
 	}
 	
@@ -36,8 +36,4 @@ public class UIScript : MonoBehaviour {
 		else 			Debug.Log ("GAME OVER");
 	}
 
-	void ReadHighScore()
-	{
-		high = 1000;
-	}
 }

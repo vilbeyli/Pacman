@@ -39,42 +39,46 @@ public class GhostMove : MonoBehaviour {
 	enum State { Wait, Init, Scatter, Chase, Run };
 	State state;
 
+	public GameGUINavigation GUINav;
+
 	//-----------------------------------------------------------------------------------------
 	// variables end, functions begin
 	void Start()
 	{
 		waypoint = transform.position;	// to avoid flickering animation
 		state = State.Wait;
-		timeToEndWait = Time.time + waitLength;
+		timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
 		InitializeWaypoints(state);
 
 	}
 
 	void FixedUpdate () 
 	{
-		animate ();
+		if(GUINav.initialWaitOver){
+			animate ();
 
-		switch(state)
-		{
-		case State.Wait:
-			Wait();
-			break;
+			switch(state)
+			{
+			case State.Wait:
+				Wait();
+				break;
 
-		case State.Init:
-			Init();
-			break;
+			case State.Init:
+				Init();
+				break;
 
-		case State.Scatter:
-			Scatter();
-			break;
+			case State.Scatter:
+				Scatter();
+				break;
 
-		case State.Chase:
-			RunAI();
-			break;
+			case State.Chase:
+				RunAI();
+				break;
 
-		case State.Run:
-			RunAway();
-			break;
+			case State.Run:
+				RunAway();
+				break;
+			}
 		}
 
 	}
