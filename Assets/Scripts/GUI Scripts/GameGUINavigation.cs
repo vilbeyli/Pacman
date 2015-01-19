@@ -9,7 +9,7 @@ public class GameGUINavigation : MonoBehaviour {
 	
 	private bool paused = false;
 	private bool quit = false;
-	public bool initialWaitOver = false;
+	//public bool initialWaitOver = false;
 
 	public float initialDelay;
 
@@ -17,6 +17,7 @@ public class GameGUINavigation : MonoBehaviour {
 	public Canvas PauseCanvas;
 	public Canvas QuitCanvas;
 	public Canvas ReadyCanvas;
+	public Canvas ScoreCanvas;
 	
 	// buttons
 	public Button MenuButton;
@@ -35,20 +36,44 @@ public class GameGUINavigation : MonoBehaviour {
 	{
 		if(Input.GetKeyDown(KeyCode.Escape))
 		{
-			if(quit == true)
-				ToggleQuit();
+			// if scores are show, go back to main menu
+			if(GameManager.gameState == GameManager.GameState.Scores)
+				Menu();
+
+			// if in game, toggle pause or quit dialogue
 			else
-				TogglePause();
+			{
+				if(quit == true)
+					ToggleQuit();
+				else
+					TogglePause();
+			}
 		}
+	}
+
+	// public handle to show ready screen coroutine call
+	public void H_ShowReadyScreen()
+	{
+		StartCoroutine("ShowReadyScreen", initialDelay);
 	}
 
 	IEnumerator ShowReadyScreen(float seconds)
 	{
-		initialWaitOver = false;
+		//initialWaitOver = false;
+		GameManager.gameState = GameManager.GameState.Init;
 		ReadyCanvas.enabled = true;
 		yield return new WaitForSeconds(seconds);
 		ReadyCanvas.enabled = false;
-		initialWaitOver = true;
+		GameManager.gameState = GameManager.GameState.Game;
+		//initialWaitOver = true;
+	}
+
+	public void getScores()
+	{
+		Time.timeScale = 0f;		// stop the animations
+		GameManager.gameState = GameManager.GameState.Scores;
+		MenuButton.enabled = false;
+		ScoreCanvas.enabled = true;
 	}
 
 	//------------------------------------------------------------------
@@ -95,6 +120,14 @@ public class GameGUINavigation : MonoBehaviour {
 	public void Menu()
 	{
 		Application.LoadLevel("menu");
+		Time.timeScale = 1.0f;
+	}
+
+	public void SubmitScores()
+	{
+		// SUBMIT SCORES TO DATABASE
+
+		Application.LoadLevel("scores");
 		Time.timeScale = 1.0f;
 	}
 }

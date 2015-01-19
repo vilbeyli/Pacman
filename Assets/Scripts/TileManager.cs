@@ -113,7 +113,7 @@ public class TileManager : MonoBehaviour {
 	
 	
 	//-----------------------------------------------------------------------
-	// Draw lines between neighbor tiles
+	// Draw lines between neighbor tiles (debug)
 	void DrawNeighbors()
 	{
 		foreach(Tile tile in tiles)
