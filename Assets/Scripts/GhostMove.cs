@@ -185,7 +185,7 @@ public class GhostMove : MonoBehaviour {
 		if(other.name == "pacman")
 		{
 			//Destroy(other.gameObject);
-			PlayerController.LoseLife();
+			//PlayerController.LoseLife();
 		}
 	}
 

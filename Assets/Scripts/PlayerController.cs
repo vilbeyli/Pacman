@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour {
 	public static int lives = 3;
 	public float speed = 0.4f;
 	Vector2 dest = Vector2.zero;
+	Vector2 dir = Vector2.right;
 
 	// script handles
 	static UIScript UI;
@@ -38,6 +39,7 @@ public class PlayerController : MonoBehaviour {
 				StartCoroutine("PlayDeadAnimation");
 			break;
 		}
+
 	
 	}
 
@@ -92,14 +94,31 @@ public class PlayerController : MonoBehaviour {
 		// Check for Input if not moving
 		if ((Vector2)transform.position == dest) {
 			if (Input.GetKey(KeyCode.UpArrow) && valid(Vector2.up))
+			{
 				dest = (Vector2)transform.position + Vector2.up;
+				dir = Vector2.up;
+			}
 			if (Input.GetKey(KeyCode.RightArrow) && valid(Vector2.right))
+			{
 				dest = (Vector2)transform.position + Vector2.right;
+				dir = Vector2.right;
+			}
 			if (Input.GetKey(KeyCode.DownArrow) && valid(-Vector2.up))
+			{
 				dest = (Vector2)transform.position - Vector2.up;
+				dir = -Vector2.up;
+			}
 			if (Input.GetKey(KeyCode.LeftArrow) && valid(-Vector2.right))
+			{
 				dest = (Vector2)transform.position - Vector2.right;
+				dir = -Vector2.right;
+			}
 		}
+	}
+
+	public Vector2 getDir()
+	{
+		return dir;
 	}
 
 }

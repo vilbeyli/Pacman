@@ -9,38 +9,36 @@ public class AI : MonoBehaviour {
 
 	private List<TileManager.Tile> tiles = new List<TileManager.Tile>();
 	private TileManager manager;
-	public GhostMove blinky;
+	public GhostMove ghost;
 
 	public TileManager.Tile nextTile = null;
+	public TileManager.Tile targetTile;
+	TileManager.Tile currentTile;
 
 	void Awake()
 	{
 		manager = GameObject.Find("Game Manager").GetComponent<TileManager>();
 		tiles = manager.tiles;
 
-		if(blinky == null)	Debug.Log ("game object blinky not found");
+		if(ghost == null)	Debug.Log ("game object ghost not found");
 		if(manager == null)	Debug.Log ("game object Game Manager not found");
 	}
 
 	void FixedUpdate()
 	{ 
-		if(blinky.AI){
-
-			// get the target tile position (round it down to int so we can reach with Index() function)
-			Vector3 targetPos = new Vector3 (target.position.x+0.499f, target.position.y+0.499f);
-			TileManager.Tile targetTile = tiles[manager.Index((int)targetPos.x, (int)targetPos.y)];
-
+		if(ghost.AI){
 			// get current tile
 			Vector3 currentPos = new Vector3(transform.position.x + 0.499f, transform.position.y + 0.499f);
-			TileManager.Tile currentTile = tiles[manager.Index ((int)currentPos.x, (int)currentPos.y)];
+			currentTile = tiles[manager.Index ((int)currentPos.x, (int)currentPos.y)];
 
-			//Debug.Log (blinky.direction.x + " " + blinky.direction.y);
+			targetTile = GetTargetTilePerGhost();
+			//Debug.Log ("Target Tile: " + targetTile.x + ", " + targetTile.y);
 
 			// get the next tile according to direction
-			if(blinky.direction.x > 0)	nextTile = tiles[manager.Index ((int)(currentPos.x+1), (int)currentPos.y)];
-			if(blinky.direction.x < 0)	nextTile = tiles[manager.Index ((int)(currentPos.x-1), (int)currentPos.y)];
-			if(blinky.direction.y > 0)	nextTile = tiles[manager.Index ((int)currentPos.x, (int)(currentPos.y+1))];
-			if(blinky.direction.y < 0)	nextTile = tiles[manager.Index ((int)currentPos.x, (int)(currentPos.y-1))];
+			if(ghost.direction.x > 0)	nextTile = tiles[manager.Index ((int)(currentPos.x+1), (int)currentPos.y)];
+			if(ghost.direction.x < 0)	nextTile = tiles[manager.Index ((int)(currentPos.x-1), (int)currentPos.y)];
+			if(ghost.direction.y > 0)	nextTile = tiles[manager.Index ((int)currentPos.x, (int)(currentPos.y+1))];
+			if(ghost.direction.y < 0)	nextTile = tiles[manager.Index ((int)currentPos.x, (int)(currentPos.y-1))];
 				
 			if(nextTile.occupied || currentTile.isIntersection)
 			{
@@ -48,19 +46,19 @@ public class AI : MonoBehaviour {
 				// IF WE BUMP INTO WALL
 				if(nextTile.occupied && !currentTile.isIntersection)
 				{
-					// if blinky moves to right or left and there is wall next tile
-					if(blinky.direction.x != 0)
+					// if ghost moves to right or left and there is wall next tile
+					if(ghost.direction.x != 0)
 					{
-						if(currentTile.down == null)	blinky.direction = Vector3.up;
-						else 							blinky.direction = Vector3.down;
+						if(currentTile.down == null)	ghost.direction = Vector3.up;
+						else 							ghost.direction = Vector3.down;
 					
 					}
 
-					// if blinky moves to up or down and there is wall next tile
-					else if(blinky.direction.y != 0)
+					// if ghost moves to up or down and there is wall next tile
+					else if(ghost.direction.y != 0)
 					{
-						if(currentTile.left == null)	blinky.direction = Vector3.right; 
-						else 							blinky.direction = Vector3.left;
+						if(currentTile.left == null)	ghost.direction = Vector3.right; 
+						else 							ghost.direction = Vector3.left;
 
 					}
 
@@ -74,16 +72,16 @@ public class AI : MonoBehaviour {
 
 					float dist1, dist2, dist3, dist4;
 					dist1 = dist2 = dist3 = dist4 = 999999f;
-					if(currentTile.up != null && !currentTile.up.occupied && !(blinky.direction.y < 0)) 		dist1 = manager.distance(currentTile.up, targetTile);
-					if(currentTile.down != null && !currentTile.down.occupied &&  !(blinky.direction.y > 0)) 	dist2 = manager.distance(currentTile.down, targetTile);
-					if(currentTile.left != null && !currentTile.left.occupied && !(blinky.direction.x > 0)) 	dist3 = manager.distance(currentTile.left, targetTile);
-					if(currentTile.right != null && !currentTile.right.occupied && !(blinky.direction.x < 0))	dist4 = manager.distance(currentTile.right, targetTile);
+					if(currentTile.up != null && !currentTile.up.occupied && !(ghost.direction.y < 0)) 		dist1 = manager.distance(currentTile.up, targetTile);
+					if(currentTile.down != null && !currentTile.down.occupied &&  !(ghost.direction.y > 0)) 	dist2 = manager.distance(currentTile.down, targetTile);
+					if(currentTile.left != null && !currentTile.left.occupied && !(ghost.direction.x > 0)) 	dist3 = manager.distance(currentTile.left, targetTile);
+					if(currentTile.right != null && !currentTile.right.occupied && !(ghost.direction.x < 0))	dist4 = manager.distance(currentTile.right, targetTile);
 
 					float min = Mathf.Min(dist1, dist2, dist3, dist4);
-					if(min == dist1) blinky.direction = Vector3.up;
-					if(min == dist2) blinky.direction = Vector3.down;
-					if(min == dist3) blinky.direction = Vector3.left;
-					if(min == dist4) blinky.direction = Vector3.right;
+					if(min == dist1) ghost.direction = Vector3.up;
+					if(min == dist2) ghost.direction = Vector3.down;
+					if(min == dist3) ghost.direction = Vector3.left;
+					if(min == dist4) ghost.direction = Vector3.right;
 
 				}
 
@@ -92,9 +90,58 @@ public class AI : MonoBehaviour {
 			// if there is no decision to be made, designate next waypoint for the ghost
 			else
 			{
-				blinky.direction = blinky.direction;	// setter updates the waypoint
+				ghost.direction = ghost.direction;	// setter updates the waypoint
 			}
 
 		}
+	}
+
+	TileManager.Tile GetTargetTilePerGhost()
+	{
+		Vector3 targetPos;
+		TileManager.Tile targetTile;
+		Vector3 dir;
+
+		// get the target tile position (round it down to int so we can reach with Index() function)
+		switch(name)
+		{
+		case "blinky":	// target = pacman
+			targetPos = new Vector3 (target.position.x+0.499f, target.position.y+0.499f);
+			targetTile = tiles[manager.Index((int)targetPos.x, (int)targetPos.y)];
+			break;
+		case "pinky":	// target = pacman + 4*pacman's direction (4 steps ahead of pacman)
+			dir = target.GetComponent<PlayerController>().getDir();
+			targetPos = new Vector3 (target.position.x+0.499f, target.position.y+0.499f) + 4*dir;
+
+			// if pacmans going up, not 4 ahead but 4 up and 4 left is the target
+			// read about it here: http://gameinternals.com/post/2072558330/understanding-pac-man-ghost-behavior
+			// so subtract 4 from X coord from target position
+			if(dir == Vector3.up)	targetPos -= new Vector3(4, 0, 0);
+
+			targetTile = tiles[manager.Index((int)targetPos.x, (int)targetPos.y)];
+			break;
+		case "inky":	// target = ambushVector(pacman+2 - blinky) added to pacman+2
+			dir = target.GetComponent<PlayerController>().getDir();
+			Vector3 blinkyPos = GameObject.Find ("blinky").transform.position;
+			Vector3 ambushVector = target.position + 2*dir - blinkyPos ;
+			targetPos = new Vector3 (target.position.x+0.499f, target.position.y+0.499f) + 2*dir + ambushVector;
+			targetTile = tiles[manager.Index((int)targetPos.x, (int)targetPos.y)];
+			break;
+		case "clyde":
+			targetPos = new Vector3 (target.position.x+0.499f, target.position.y+0.499f);
+			targetTile = tiles[manager.Index((int)targetPos.x, (int)targetPos.y)];
+			if(manager.distance(targetTile, currentTile) < 9)
+				targetTile = tiles[manager.Index (0, 2)];
+			break;
+		default:
+			targetTile = null;
+			Debug.Log ("TARGET TILE NOT ASSIGNED");
+			break;
+		
+		}
+
+
+
+		return targetTile;
 	}
 }

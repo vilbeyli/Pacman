@@ -131,12 +131,28 @@ public class TileManager : MonoBehaviour {
 		}
 		
 	}
-	
+
+
 	//----------------------------------------------------------------------
 	// returns the index in the tiles list of a given tile's coordinates
 	public int Index(int X, int Y)
 	{
-		return (31-Y)*28 + X-1;
+		// if the requsted index is in bounds
+		//Debug.Log ("Index called for X: " + X + ", Y: " + Y);
+		if(X>=1 && X<=28 && Y<=31 && Y>=1)
+			return (31-Y)*28 + X-1;
+
+		// else, if the requested index is out of bounds
+		// return closest in-bounds tile's index 
+		else
+		{
+			if(X<1)		X = 1;
+			if(X>28) 	X = 28;
+			if(Y<1)		Y = 1;
+			if(Y>31)	Y = 31;
+
+			return (31-Y)*28 + X-1;
+		}
 	}
 	
 	public int Index(Tile tile)
