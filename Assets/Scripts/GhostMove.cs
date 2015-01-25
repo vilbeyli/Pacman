@@ -8,7 +8,6 @@ public class GhostMove : MonoBehaviour {
 
 	private Vector3 waypoint;			// AI-determined waypoint
 	private Queue<Vector3> waypoints;	// waypoints used on Init and Scatter states
-	public bool AI = false;
 
 	// direction is set from the AI component
 	public Vector3 _direction;
@@ -22,12 +21,13 @@ public class GhostMove : MonoBehaviour {
 		set
 		{
 			_direction = value;
-			waypoint = transform.position + _direction;
+			Vector3 pos = new Vector3((int)transform.position.x, (int)transform.position.y, (int)transform.position.z);
+			waypoint = pos + _direction;
 			//Debug.Log ("waypoint (" + waypoint.position.x + ", " + waypoint.position.y + ") set! _direction: " + _direction.x + ", " + _direction.y);
+		
 		}
 	}
 
-	public AI AIComponent;
 	public float speed = 0.3f;
 
 	public float scatterLength = 5f;
@@ -38,6 +38,7 @@ public class GhostMove : MonoBehaviour {
 
 	enum State { Wait, Init, Scatter, Chase, Run };
 	State state;
+	State previousState;
 
 	// handles
 	public GameGUINavigation GUINav;
@@ -77,7 +78,6 @@ public class GhostMove : MonoBehaviour {
 				break;
 			}
 		}
-
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -87,6 +87,7 @@ public class GhostMove : MonoBehaviour {
 	{
 		waypoint = transform.position;	// to avoid flickering animation
 		state = State.Wait;
+		previousState = state;
 		timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
 		InitializeWaypoints(state);
 	}
@@ -178,6 +179,7 @@ public class GhostMove : MonoBehaviour {
 		Vector3 dir = waypoint - transform.position;
 		GetComponent<Animator>().SetFloat("DirX", dir.x);
 		GetComponent<Animator>().SetFloat("DirY", dir.y);
+		GetComponent<Animator>().SetBool("Run", false);
 	}
 
 	void OnTriggerEnter2D(Collider2D other)
@@ -196,6 +198,7 @@ public class GhostMove : MonoBehaviour {
 		if(Time.time >= timeToEndWait)
 		{
 			state = State.Init;
+			previousState = state;
 			waypoints.Clear();
 			InitializeWaypoints(state);
 		}
@@ -210,6 +213,7 @@ public class GhostMove : MonoBehaviour {
 		if(waypoints.Count == 0)
 		{
 			state = State.Scatter;
+			previousState = state;
 
 			//get direction according to sprite name
 			string name = GetComponent<SpriteRenderer>().sprite.name;
@@ -234,6 +238,7 @@ public class GhostMove : MonoBehaviour {
 		{
 			waypoints.Clear();
 			state = State.Chase;
+			previousState = state;
 			return;
 		}
 
@@ -248,18 +253,28 @@ public class GhostMove : MonoBehaviour {
 		// if not at waypoint, move towards it
 		if(transform.position != waypoint)
 		{
-			AI = false;
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
 			rigidbody2D.MovePosition(p);
 		}
 
 		// if at waypoint, run AI module
-		else  AI = true;
+		else GetComponent<AI>().AILogic();
 
 	}
 
 	void RunAway()
 	{
+		GetComponent<Animator>().SetBool("Run", true);
+
+		// if not at waypoint, move towards it
+		if(transform.position != waypoint)
+		{
+			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
+			rigidbody2D.MovePosition(p);
+		}
+		
+		// if at waypoint, run AI run away logic
+		else GetComponent<AI>().RunLogic();
 
 	}
 
@@ -270,6 +285,7 @@ public class GhostMove : MonoBehaviour {
 		waypoint = waypoints.Peek();		// get the waypoint
 		if(transform.position != waypoint)	// if its not reached
 		{									// move towards it
+			_direction = Vector3.Normalize(waypoint - transform.position);	// dont screw up waypoint by calling public setter
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
 			rigidbody2D.MovePosition(p);
 		}
@@ -278,5 +294,25 @@ public class GhostMove : MonoBehaviour {
 			if(loop)	waypoints.Enqueue(waypoints.Dequeue());
 			else		waypoints.Dequeue();
 		}
+	}
+
+	public void Frighten()
+	{
+		state = State.Run;
+		_direction *= -1;
+	}
+
+	public void Calm()
+	{
+		// if the ghost was scared in wait or initialization state, end it when the ghost calms down
+		if(previousState == State.Wait || previousState == State.Init || previousState == State.Scatter)
+		{
+			//waypoints.Clear ();
+			//state = State.Chase;
+		}
+
+		//state = previousState;
+		waypoints.Clear ();
+		state = State.Chase;	
 	}
 }

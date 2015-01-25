@@ -15,6 +15,11 @@ public class GameManager : MonoBehaviour {
 
 	private GameGUINavigation guiNav;
 
+	private bool scared = false;
+
+	public float scareLength;
+	private float timeToCalm;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -25,7 +30,8 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-	
+		if(scared == true && timeToCalm <= Time.time)
+			CalmGhosts();
 	}
 
 	public void ResetScene()
@@ -43,5 +49,30 @@ public class GameManager : MonoBehaviour {
 		clyde.GetComponent<GhostMove>().InitializeGhost();
 
 		guiNav.H_ShowReadyScreen();
+	}
+
+	public void ToggleScare()
+	{
+		if(!scared)	ScareGhosts();
+		else 		CalmGhosts();
+	}
+
+	public void ScareGhosts()
+	{
+		scared = true;
+		blinky.GetComponent<GhostMove>().Frighten();
+		pinky.GetComponent<GhostMove>().Frighten();
+		inky.GetComponent<GhostMove>().Frighten();
+		clyde.GetComponent<GhostMove>().Frighten();
+		timeToCalm = Time.time + scareLength;
+	}
+
+	public void CalmGhosts()
+	{
+		scared = false;
+		blinky.GetComponent<GhostMove>().Calm();
+		pinky.GetComponent<GhostMove>().Calm();
+		inky.GetComponent<GhostMove>().Calm();
+		clyde.GetComponent<GhostMove>().Calm();
 	}
 }
