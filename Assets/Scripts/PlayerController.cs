@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 public class PlayerController : MonoBehaviour {
@@ -7,6 +8,16 @@ public class PlayerController : MonoBehaviour {
 	public float speed = 0.4f;
 	Vector2 dest = Vector2.zero;
 	Vector2 dir = Vector2.right;
+
+    [Serializable]
+    public class PointSprites
+    {
+        public GameObject[] pointSprites;
+    }
+
+    public PointSprites points;
+
+    public static int killstreak = 0;
 
 	// script handles
 	static UIScript UI;
@@ -121,4 +132,15 @@ public class PlayerController : MonoBehaviour {
 		return dir;
 	}
 
+    public void UpdateScore()
+    {
+        killstreak++;
+
+        // limit killstreak at 4
+        if (killstreak > 4) killstreak = 4;
+    
+        Instantiate(points.pointSprites[killstreak-1], transform.position, Quaternion.identity);
+        GameManager.score += (int)Mathf.Pow(2, killstreak)*100;
+
+    }
 }

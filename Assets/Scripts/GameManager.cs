@@ -14,7 +14,8 @@ public class GameManager : MonoBehaviour {
 
 	private GameGUINavigation guiNav;
 
-	private bool scared = false;
+	public static bool scared = false;
+    static public int score;
 
 	public float scareLength;
 	private float timeToCalm;
@@ -75,5 +76,6 @@ public class GameManager : MonoBehaviour {
 		pinky.GetComponent<GhostMove>().Calm();
 		inky.GetComponent<GhostMove>().Calm();
 		clyde.GetComponent<GhostMove>().Calm();
+	    PlayerController.killstreak = 0;
 	}
 }

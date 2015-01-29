@@ -7,7 +7,7 @@ public class Pacdot : MonoBehaviour {
 	{
 		if(other.name == "pacman")
 		{
-			UIScript.score += 10;
+			GameManager.score += 10;
 			Destroy(gameObject);
 		}
 	}

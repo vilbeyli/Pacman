@@ -52,6 +52,7 @@ public class GhostMove : MonoBehaviour {
 
 	// handles
 	public GameGUINavigation GUINav;
+    public PlayerController pacman;
     private GameManager _gm;
 
 	//-----------------------------------------------------------------------------------------
@@ -105,6 +106,16 @@ public class GhostMove : MonoBehaviour {
 		timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
 		InitializeWaypoints(state);
 	}
+
+    public void InitializeGhost(Vector3 pos)
+    {
+        transform.position = pos;
+        waypoint = transform.position;	// to avoid flickering animation
+        state = State.Wait;
+        previousState = state;
+        timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
+        InitializeWaypoints(state);
+    }
 
 	void InitializeWaypoints(State st)
 	{
@@ -222,7 +233,12 @@ public class GhostMove : MonoBehaviour {
 		{
 			//Destroy(other.gameObject);
 		    if (state == State.Run)
-		        ; // TODO: RESET GHOST
+		    {
+		        Calm();
+		        InitializeGhost(_startPos);
+                pacman.UpdateScore();
+		    }
+		       
 		    else
 		    {
 		        ;//PlayerController.LoseLife();
@@ -326,7 +342,7 @@ public class GhostMove : MonoBehaviour {
 	// Utility functions
 	void MoveToWaypoint(bool loop = false)
 	{
-		waypoint = waypoints.Peek();		// get the waypoint
+		waypoint = waypoints.Peek();		// get the waypoint (CHECK NULL?)
 		if(transform.position != waypoint)	// if its not reached
 		{									// move towards it
 			_direction = Vector3.Normalize(waypoint - transform.position);	// dont screw up waypoint by calling public setter
@@ -369,6 +385,7 @@ public class GhostMove : MonoBehaviour {
 	    _timeToToggleWhite = 0;
 	    _timeToWhite = 0;
         GetComponent<Animator>().SetBool("Run_White", false);
+        GetComponent<Animator>().SetBool("Run", false);
 	}
 
     public void ToggleBlueWhite()

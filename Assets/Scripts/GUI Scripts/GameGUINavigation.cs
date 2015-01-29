@@ -7,7 +7,7 @@ public class GameGUINavigation : MonoBehaviour {
 	//------------------------------------------------------------------
 	// Variable declarations
 	
-	private bool paused = false;
+	private bool _paused;
 	private bool quit = false;
 	//public bool initialWaitOver = false;
 
@@ -82,11 +82,11 @@ public class GameGUINavigation : MonoBehaviour {
 	public void TogglePause()
 	{
 		// if paused before key stroke, unpause the game
-		if(paused)
+		if(_paused)
 		{
 			Time.timeScale = 1;
 			PauseCanvas.enabled = false;
-			paused = false;
+			_paused = false;
 			MenuButton.enabled = true;
 		}
 		
@@ -95,7 +95,7 @@ public class GameGUINavigation : MonoBehaviour {
 		{
 			PauseCanvas.enabled = true;
 			Time.timeScale = 0.0f;
-			paused = true;
+			_paused = true;
 			MenuButton.enabled = false;
 		}
 	}

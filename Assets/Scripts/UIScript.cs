@@ -4,8 +4,7 @@ using System.Collections;
 
 public class UIScript : MonoBehaviour {
 
-	static public int score;
-	int high;
+	int high, score;
 
 	public Image[] lives;
 
@@ -18,13 +17,13 @@ public class UIScript : MonoBehaviour {
 		txt_high = GetComponentsInChildren<Text>()[0];
 		
 		high = Scores.High();
-		score = 0;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		// update score text
+        // update score text
+        score = GameManager.score;
 		txt_score.text = "Score\n" + score;
 		txt_high.text = "High Score\n" + high;
 
