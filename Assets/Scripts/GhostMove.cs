@@ -6,6 +6,8 @@ using System;
 
 public class GhostMove : MonoBehaviour {
 
+    // ----------------------------
+    // Navigation variables
 	private Vector3 waypoint;			// AI-determined waypoint
 	private Queue<Vector3> waypoints;	// waypoints used on Init and Scatter states
 
@@ -30,6 +32,8 @@ public class GhostMove : MonoBehaviour {
 
 	public float speed = 0.3f;
 
+    // ----------------------------
+    // Ghost mode variables
 	public float scatterLength = 5f;
 	public float waitLength = 0.0f;
 
@@ -40,13 +44,22 @@ public class GhostMove : MonoBehaviour {
 	State state;
 	State previousState;
 
+    private Vector3 _startPos;
+    private float _timeToWhite;
+    private float _timeToToggleWhite;
+    private float _toggleInterval;
+    private bool isWhite = false;
+
 	// handles
 	public GameGUINavigation GUINav;
+    private GameManager _gm;
 
 	//-----------------------------------------------------------------------------------------
 	// variables end, functions begin
 	void Start()
 	{
+	    _gm = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        _toggleInterval = _gm.scareLength * 0.33f * 0.20f;  
 		InitializeGhost();
 	}
 
@@ -70,7 +83,7 @@ public class GhostMove : MonoBehaviour {
 				break;
 
 			case State.Chase:
-				RunAI();
+				ChaseAI();
 				break;
 
 			case State.Run:
@@ -85,6 +98,7 @@ public class GhostMove : MonoBehaviour {
 
 	public void InitializeGhost()
 	{
+	    _startPos = getStartPosAccordingToName();
 		waypoint = transform.position;	// to avoid flickering animation
 		state = State.Wait;
 		previousState = state;
@@ -172,6 +186,26 @@ public class GhostMove : MonoBehaviour {
 		stream.Close();
 	}
 
+    private Vector3 getStartPosAccordingToName()
+    {
+        switch (gameObject.name)
+        {
+            case "blinky":
+                return new Vector3(15f, 20f, 0f);
+
+            case "pinky":
+                return new Vector3(14.5f, 17f, 0f);
+            
+            case "inky":
+                return new Vector3(16.5f, 17f, 0f);
+
+            case "clyde":
+                return new Vector3(12.5f, 17f, 0f);
+        }
+
+        return new Vector3();
+    }
+
 	//------------------------------------------------------------------------------------
 	// Update functions
 	void animate()
@@ -187,7 +221,13 @@ public class GhostMove : MonoBehaviour {
 		if(other.name == "pacman")
 		{
 			//Destroy(other.gameObject);
-			//PlayerController.LoseLife();
+		    if (state == State.Run)
+		        ; // TODO: RESET GHOST
+		    else
+		    {
+		        ;//PlayerController.LoseLife();
+		    }
+
 		}
 	}
 
@@ -209,6 +249,8 @@ public class GhostMove : MonoBehaviour {
 
 	void Init()
 	{
+	    _timeToWhite = 0;
+
 		// if the Queue is cleared, do some clean up and change the state
 		if(waypoints.Count == 0)
 		{
@@ -247,7 +289,7 @@ public class GhostMove : MonoBehaviour {
 
 	}
 
-	void RunAI()
+    void ChaseAI()
 	{
 
 		// if not at waypoint, move towards it
@@ -265,6 +307,8 @@ public class GhostMove : MonoBehaviour {
 	void RunAway()
 	{
 		GetComponent<Animator>().SetBool("Run", true);
+
+        if(Time.time >= _timeToWhite && Time.time >= _timeToToggleWhite)   ToggleBlueWhite();
 
 		// if not at waypoint, move towards it
 		if(transform.position != waypoint)
@@ -300,10 +344,18 @@ public class GhostMove : MonoBehaviour {
 	{
 		state = State.Run;
 		_direction *= -1;
+
+        _timeToWhite = Time.time + _gm.scareLength * 0.66f;
+        _timeToToggleWhite = _timeToWhite;
+        GetComponent<Animator>().SetBool("Run_White", false);
+
 	}
 
 	public void Calm()
 	{
+        // if the ghost is not running, do nothing
+	    if (state != State.Run) return;
+
 		// if the ghost was scared in wait or initialization state, end it when the ghost calms down
 		if(previousState == State.Wait || previousState == State.Init || previousState == State.Scatter)
 		{
@@ -313,6 +365,17 @@ public class GhostMove : MonoBehaviour {
 
 		//state = previousState;
 		waypoints.Clear ();
-		state = State.Chase;	
+		state = State.Chase;
+	    _timeToToggleWhite = 0;
+	    _timeToWhite = 0;
+        GetComponent<Animator>().SetBool("Run_White", false);
 	}
+
+    public void ToggleBlueWhite()
+    {
+        isWhite = !isWhite;
+        GetComponent<Animator>().SetBool("Run_White", isWhite);
+        _timeToToggleWhite = Time.time + _toggleInterval;
+    }
+
 }

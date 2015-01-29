@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour {
 		// cast line from 'next to pacman' to pacman
 		Vector2 pos = transform.position;
 		RaycastHit2D hit = Physics2D.Linecast(pos+dir, pos);
-		return hit.collider.name == "pacdot" ? true : (hit.collider == collider2D);
+		return hit.collider.name == "pacdot" || (hit.collider == collider2D);
 	}
 
 	static public void LoseLife()

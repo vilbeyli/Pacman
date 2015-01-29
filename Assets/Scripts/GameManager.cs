@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
@@ -19,7 +18,7 @@ public class GameManager : MonoBehaviour {
 
 	public float scareLength;
 	private float timeToCalm;
-
+    
 	// Use this for initialization
 	void Start () 
 	{
@@ -30,8 +29,9 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if(scared == true && timeToCalm <= Time.time)
+		if(scared && timeToCalm <= Time.time)
 			CalmGhosts();
+
 	}
 
 	public void ResetScene()
@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour {
 		inky.GetComponent<GhostMove>().Frighten();
 		clyde.GetComponent<GhostMove>().Frighten();
 		timeToCalm = Time.time + scareLength;
+
 	}
 
 	public void CalmGhosts()
