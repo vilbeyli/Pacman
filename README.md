@@ -6,3 +6,5 @@ A Pacman clone made in Unity followed tutorials from [noobtuts](http://noobtuts.
 See [Shaunew's Pac-Man](http://pacman.shaunew.com/play/index.htm) to see how each ghost's AI works.
 
 I'll deploy a web player version of the game when it's finished.
+
+[Screenshot](http://i.imgur.com/GQcmfQY.png)
