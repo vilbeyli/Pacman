@@ -3,16 +3,13 @@ using System.Collections;
 
 public class Energizer : MonoBehaviour {
 
-    public GameManager gm;
+    private GameManager gm;
 
 	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+	void Start ()
+	{
+	    gm = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        if( gm == null )    Debug.Log("Energizer did not find Game Manager!");
 	}
 
     void OnTriggerEnter2D(Collider2D col)

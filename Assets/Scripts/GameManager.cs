@@ -1,42 +1,104 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour {
+
+    //--------------------------------------------------------
+    // Game variables
+
+    public static int Level = 0;
 
 	public enum GameState { Init, Game, Dead, Scores }
 	public static GameState gameState;
 
-	public GameObject pacman;
-	public GameObject blinky;
-	public GameObject pinky;
-	public GameObject inky;
-	public GameObject clyde;
-	public GameObject UIManager;
+    private GameObject pacman;
+    private GameObject blinky;
+    private GameObject pinky;
+    private GameObject inky;
+    private GameObject clyde;
+    private GameGUINavigation gui;
 
-	private GameGUINavigation guiNav;
-
-	public static bool scared = false;
+	public static bool scared;
     static public int score;
 
 	public float scareLength;
-	private float timeToCalm;
+	private float _timeToCalm;
+
+    public float SpeedPerLevel;
     
-	// Use this for initialization
+    //-------------------------------------------------------------------
+    // singleton implementation
+    private static GameManager _instance;
+
+    public static GameManager instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = GameObject.FindObjectOfType<GameManager>();
+                DontDestroyOnLoad(_instance.gameObject);
+            }
+
+            return _instance;
+        }
+    }
+
+    void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(this);
+        }
+        else
+        {
+            if(this != _instance)   
+                Destroy(this.gameObject);
+        }
+
+        AssignGhosts();
+    }
+
 	void Start () 
 	{
-		guiNav = UIManager.GetComponent<GameGUINavigation>();
 		gameState = GameState.Init;
 	}
-	
-	// Update is called once per frame
+
+    void OnLevelWasLoaded()
+    {
+        Debug.Log("Level " + Level + " Loaded!");
+        AssignGhosts();
+        ResetVariables();
+
+
+        // Adjust Ghost variables!
+        clyde.GetComponent<GhostMove>().speed += Level * SpeedPerLevel;
+        blinky.GetComponent<GhostMove>().speed += Level * SpeedPerLevel;
+        pinky.GetComponent<GhostMove>().speed += Level * SpeedPerLevel;
+        inky.GetComponent<GhostMove>().speed += Level * SpeedPerLevel;
+        pacman.GetComponent<PlayerController>().speed += Level*SpeedPerLevel/2;
+    }
+
+    private void ResetVariables()
+    {
+        _timeToCalm = 0.0f;
+        scared = false;
+        PlayerController.killstreak = 0;
+    }
+
+    // Update is called once per frame
 	void Update () 
 	{
-		if(scared && timeToCalm <= Time.time)
+		if(scared && _timeToCalm <= Time.time)
 			CalmGhosts();
 
 	}
 
 	public void ResetScene()
 	{
+        CalmGhosts();
+
 		pacman.transform.position = new Vector3(15f, 11f, 0f);
 		blinky.transform.position = new Vector3(15f, 20f, 0f);
 		pinky.transform.position = new Vector3(14.5f, 17f, 0f);
@@ -49,7 +111,9 @@ public class GameManager : MonoBehaviour {
 		inky.GetComponent<GhostMove>().InitializeGhost();
 		clyde.GetComponent<GhostMove>().InitializeGhost();
 
-		guiNav.H_ShowReadyScreen();
+        gameState = GameState.Init;     //PROBLEM HERE
+        gui.H_ShowReadyScreen();
+
 	}
 
 	public void ToggleScare()
@@ -65,8 +129,9 @@ public class GameManager : MonoBehaviour {
 		pinky.GetComponent<GhostMove>().Frighten();
 		inky.GetComponent<GhostMove>().Frighten();
 		clyde.GetComponent<GhostMove>().Frighten();
-		timeToCalm = Time.time + scareLength;
+		_timeToCalm = Time.time + scareLength;
 
+        Debug.Log("Ghosts Scared");
 	}
 
 	public void CalmGhosts()
@@ -77,5 +142,23 @@ public class GameManager : MonoBehaviour {
 		inky.GetComponent<GhostMove>().Calm();
 		clyde.GetComponent<GhostMove>().Calm();
 	    PlayerController.killstreak = 0;
-	}
+    }
+
+    void AssignGhosts()
+    {
+        // find and assign ghosts
+        clyde = GameObject.Find("clyde");
+        pinky = GameObject.Find("pinky");
+        inky = GameObject.Find("inky");
+        blinky = GameObject.Find("blinky");
+        pacman = GameObject.Find("pacman");
+
+        if (clyde == null || pinky == null || inky == null || blinky == null) Debug.Log("One of ghosts are NULL");
+        if (pacman == null) Debug.Log("Pacman is NULL");
+
+        gui = GameObject.FindObjectOfType<GameGUINavigation>();
+
+        if(gui == null) Debug.Log("GUI Handle Null!");
+
+    }
 }

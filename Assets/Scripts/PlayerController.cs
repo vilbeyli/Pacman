@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour {
     public static int killstreak = 0;
 
 	// script handles
-	static UIScript UI;
 	static GameGUINavigation GUINav;
 	GameManager GM;
 
@@ -29,7 +28,6 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		UI = GameObject.Find("UI").GetComponent<UIScript>();
 		GM = GameObject.Find ("Game Manager").GetComponent<GameManager>();
 		GUINav = GameObject.Find ("UI Manager").GetComponent<GameGUINavigation>();
 		dest = transform.position;
@@ -84,7 +82,6 @@ public class PlayerController : MonoBehaviour {
 	static public void LoseLife()
 	{
 		lives--;
-		UI.UpdateLives(lives);
 
 		GameManager.gameState = GameManager.GameState.Dead;
 	}

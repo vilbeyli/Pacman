@@ -64,8 +64,12 @@ public class GhostMove : MonoBehaviour {
 		InitializeGhost();
 	}
 
-	void FixedUpdate () 
+    public float DISTANCE;
+
+	void FixedUpdate ()
 	{
+	    DISTANCE = Vector3.Distance(transform.position, waypoint);
+
 		if(GameManager.gameState == GameManager.GameState.Game){
 			animate ();
 
@@ -241,7 +245,7 @@ public class GhostMove : MonoBehaviour {
 		       
 		    else
 		    {
-		        ;//PlayerController.LoseLife();
+		        PlayerController.LoseLife();
 		    }
 
 		}
@@ -308,8 +312,8 @@ public class GhostMove : MonoBehaviour {
     void ChaseAI()
 	{
 
-		// if not at waypoint, move towards it
-		if(transform.position != waypoint)
+        // if not at waypoint, move towards it
+        if (Vector3.Distance(transform.position, waypoint) > 0.000000000001)
 		{
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
 			rigidbody2D.MovePosition(p);
@@ -327,7 +331,7 @@ public class GhostMove : MonoBehaviour {
         if(Time.time >= _timeToWhite && Time.time >= _timeToToggleWhite)   ToggleBlueWhite();
 
 		// if not at waypoint, move towards it
-		if(transform.position != waypoint)
+        if (Vector3.Distance(transform.position, waypoint) > 0.000000000001)
 		{
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
 			rigidbody2D.MovePosition(p);
@@ -343,8 +347,8 @@ public class GhostMove : MonoBehaviour {
 	void MoveToWaypoint(bool loop = false)
 	{
 		waypoint = waypoints.Peek();		// get the waypoint (CHECK NULL?)
-		if(transform.position != waypoint)	// if its not reached
-		{									// move towards it
+        if (Vector3.Distance(transform.position, waypoint) > 0.000000000001)	// if its not reached
+		{									                        // move towards it
 			_direction = Vector3.Normalize(waypoint - transform.position);	// dont screw up waypoint by calling public setter
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
 			rigidbody2D.MovePosition(p);
@@ -372,14 +376,6 @@ public class GhostMove : MonoBehaviour {
         // if the ghost is not running, do nothing
 	    if (state != State.Run) return;
 
-		// if the ghost was scared in wait or initialization state, end it when the ghost calms down
-		if(previousState == State.Wait || previousState == State.Init || previousState == State.Scatter)
-		{
-			//waypoints.Clear ();
-			//state = State.Chase;
-		}
-
-		//state = previousState;
 		waypoints.Clear ();
 		state = State.Chase;
 	    _timeToToggleWhite = 0;

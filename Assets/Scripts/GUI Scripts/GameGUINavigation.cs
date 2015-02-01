@@ -121,13 +121,30 @@ public class GameGUINavigation : MonoBehaviour {
 	{
 		Application.LoadLevel("menu");
 		Time.timeScale = 1.0f;
+
+        // take care of game manager
+        Destroy(GameObject.Find("Game Manager"));
+	    GameManager.score = 0;
+	    GameManager.Level = 0;
 	}
 
 	public void SubmitScores()
 	{
 		// SUBMIT SCORES TO DATABASE
 
+
+        // take care of game manager
+        Destroy(GameObject.Find("Game Manager"));
+        GameManager.score = 0;
+        GameManager.Level = 0;
+
 		Application.LoadLevel("scores");
 		Time.timeScale = 1.0f;
 	}
+
+    public void LoadLevel()
+    {
+        GameManager.Level++;
+        Application.LoadLevel("game");
+    }
 }
