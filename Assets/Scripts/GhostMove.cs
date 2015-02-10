@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System;
+using UnityEngine;
 
 public class GhostMove : MonoBehaviour {
 
@@ -42,7 +41,6 @@ public class GhostMove : MonoBehaviour {
 
 	enum State { Wait, Init, Scatter, Chase, Run };
 	State state;
-	State previousState;
 
     private Vector3 _startPos;
     private float _timeToWhite;
@@ -106,8 +104,7 @@ public class GhostMove : MonoBehaviour {
 	    _startPos = getStartPosAccordingToName();
 		waypoint = transform.position;	// to avoid flickering animation
 		state = State.Wait;
-		previousState = state;
-		timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
+	    timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
 		InitializeWaypoints(state);
 	}
 
@@ -116,7 +113,6 @@ public class GhostMove : MonoBehaviour {
         transform.position = pos;
         waypoint = transform.position;	// to avoid flickering animation
         state = State.Wait;
-        previousState = state;
         timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
         InitializeWaypoints(state);
     }
@@ -245,7 +241,7 @@ public class GhostMove : MonoBehaviour {
 		       
 		    else
 		    {
-		        PlayerController.LoseLife();
+		        _gm.LoseLife();
 		    }
 
 		}
@@ -258,8 +254,7 @@ public class GhostMove : MonoBehaviour {
 		if(Time.time >= timeToEndWait)
 		{
 			state = State.Init;
-			previousState = state;
-			waypoints.Clear();
+		    waypoints.Clear();
 			InitializeWaypoints(state);
 		}
 
@@ -275,9 +270,8 @@ public class GhostMove : MonoBehaviour {
 		if(waypoints.Count == 0)
 		{
 			state = State.Scatter;
-			previousState = state;
 
-			//get direction according to sprite name
+		    //get direction according to sprite name
 			string name = GetComponent<SpriteRenderer>().sprite.name;
 			if(name[name.Length-1] == '0' || name[name.Length-1] == '1')	direction = Vector3.right;
 			if(name[name.Length-1] == '2' || name[name.Length-1] == '3')	direction = Vector3.left;
@@ -300,8 +294,7 @@ public class GhostMove : MonoBehaviour {
 		{
 			waypoints.Clear();
 			state = State.Chase;
-			previousState = state;
-			return;
+		    return;
 		}
 
 		// get the next waypoint and move towards it

@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
     // Game variables
 
     public static int Level = 0;
+    public static int lives = 3;
 
 	public enum GameState { Init, Game, Dead, Scores }
 	public static GameState gameState;
@@ -44,6 +45,9 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    //-------------------------------------------------------------------
+    // function definitions
+
     void Awake()
     {
         if (_instance == null)
@@ -67,6 +71,8 @@ public class GameManager : MonoBehaviour {
 
     void OnLevelWasLoaded()
     {
+        if (Level == 0) lives = 3;
+
         Debug.Log("Level " + Level + " Loaded!");
         AssignGhosts();
         ResetVariables();
@@ -111,7 +117,7 @@ public class GameManager : MonoBehaviour {
 		inky.GetComponent<GhostMove>().InitializeGhost();
 		clyde.GetComponent<GhostMove>().InitializeGhost();
 
-        gameState = GameState.Init;     //PROBLEM HERE
+        gameState = GameState.Init;  
         gui.H_ShowReadyScreen();
 
 	}
@@ -160,5 +166,25 @@ public class GameManager : MonoBehaviour {
 
         if(gui == null) Debug.Log("GUI Handle Null!");
 
+    }
+
+    public void LoseLife()
+    {
+        lives--;
+        gameState = GameState.Dead;
+    
+        // update UI too
+        UIScript ui = GameObject.FindObjectOfType<UIScript>();
+        Destroy(ui.lives[ui.lives.Count - 1]);
+        ui.lives.RemoveAt(ui.lives.Count - 1);
+    }
+
+    public static void DestroySelf()
+    {
+
+        score = 0;
+        Level = 0;
+        lives = 3;
+        Destroy(GameObject.Find("Game Manager"));
     }
 }

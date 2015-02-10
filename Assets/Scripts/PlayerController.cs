@@ -4,7 +4,6 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
-	public static int lives = 3;
 	public float speed = 0.4f;
 	Vector2 dest = Vector2.zero;
 	Vector2 dir = Vector2.right;
@@ -20,8 +19,9 @@ public class PlayerController : MonoBehaviour {
     public static int killstreak = 0;
 
 	// script handles
-	static GameGUINavigation GUINav;
-	GameManager GM;
+	private GameGUINavigation GUINav;
+	private GameManager GM;
+    private ScoreManager SM;
 
 	private bool deadPlaying = false;
 
@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour {
 	void Start () 
 	{
 		GM = GameObject.Find ("Game Manager").GetComponent<GameManager>();
+	    SM = GameObject.Find("Game Manager").GetComponent<ScoreManager>();
 		GUINav = GameObject.Find ("UI Manager").GetComponent<GameGUINavigation>();
 		dest = transform.position;
 	}
@@ -60,8 +61,17 @@ public class PlayerController : MonoBehaviour {
 		GetComponent<Animator>().SetBool("Die", false);
 		deadPlaying = false;
 
-		if(lives <= 0)	GUINav.getScores();
-		else			GM.ResetScene();
+	    if (GameManager.lives <= 0)
+	    {
+            Debug.Log("Treshold for High Score: " + SM.LowestHigh());
+	        if (GameManager.score >= SM.LowestHigh())
+	            GUINav.getScoresMenu();
+	        else
+	            GUINav.H_ShowGameOverScreen();
+	    }
+
+		else			           
+            GM.ResetScene();
 	}
 
 	void animate()
@@ -77,13 +87,6 @@ public class PlayerController : MonoBehaviour {
 		Vector2 pos = transform.position;
 		RaycastHit2D hit = Physics2D.Linecast(pos+dir, pos);
 		return hit.collider.name == "pacdot" || (hit.collider == collider2D);
-	}
-
-	static public void LoseLife()
-	{
-		lives--;
-
-		GameManager.gameState = GameManager.GameState.Dead;
 	}
 
 	public void resetDestination()
