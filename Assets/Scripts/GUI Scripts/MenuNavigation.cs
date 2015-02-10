@@ -23,7 +23,12 @@ public class MenuNavigation : MonoBehaviour {
 		Application.LoadLevel("scores");
 		
 	}
-	
+
+    public void Credits()
+    {
+        Application.LoadLevel("credits");
+    }
+
 	public void SourceCode()
 	{
 		Application.OpenURL("https://github.com/vilbeyli/Pacman-Clone/");

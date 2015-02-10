@@ -20,9 +20,9 @@ public class Scores : MonoBehaviour
         foreach (ScoreManager.Score sc in scoreList)
         {
             if (sc.score < 1000)
-                s += sc.score + "\t\t" + sc.name + "\n";
+                s += sc.score + "\t\t\t" + sc.name + "\n";
             else
-                s += sc.score + "\t" + sc.name + "\n";
+                s += sc.score + "\t\t" + sc.name + "\n";
         }
 
         scores_txt.text = s;
