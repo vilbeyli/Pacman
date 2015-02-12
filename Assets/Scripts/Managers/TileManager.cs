@@ -30,11 +30,11 @@ public class TileManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		ReadTiles();
+        ReadTiles();
 
 	}
-	
-	// Update is called once per frame
+
+    // Update is called once per frame
 	void Update () 
 	{
 		//DrawNeighbors();
@@ -42,76 +42,102 @@ public class TileManager : MonoBehaviour {
 	}
 	
 	//-----------------------------------------------------------------------
-	// Read the tile infor from file: 1 = free tile, 0 = wall
-	void ReadTiles()
-	{
-		string path = Application.dataPath + "/Data/tiles.txt";
-		StreamReader stream = new StreamReader(path);
-		
-		// reading tiles from top to bottom. X:1 Y:31 (X goes up, Y goes down)
-		// so that x and y of tile will be the same as world coordinates.
-		// however, consider the tile map is encapsulated with zeroes, 
-		// therefore X starts from 1 instead of 2 and Y starts from 31 instead of 30. 
-		int X = 1, Y = 31;	
-		while(!stream.EndOfStream)
-		{
-			string line = stream.ReadLine();
-			
-			X = 1;		// for every line
-			for(int i = 0; i < line.Length ; ++i)
-			{
-				Tile newTile = new Tile(X,Y);
-				
-				// if the tile we read is a valid tile (movable)
-				if(line[i] == '1')
-				{
-					// check for left-right neighbor
-					if(i!=0 && line[i-1] == '1')
-					{
-						// assign each tile to the corresponding side of other tile
-						newTile.left = tiles[tiles.Count-1];
-						tiles[tiles.Count-1].right = newTile;
+	// hardcoded tile data: 1 = free tile, 0 = wall
+    void ReadTiles()
+    {
+        // hardwired data instead of reading from file (not feasible on web player)
+        string data = @"0000000000000000000000000000
+0111111111111001111111111110
+0100001000001001000001000010
+0100001000001111000001000010
+0100001000001001000001000010
+0111111111111001111111111110
+0100001001000000001001000010
+0100001001000000001001000010
+0111111001111001111001111110
+0001001000001001000001001000
+0001001000001001000001001000
+0111001111111111111111001110
+0100001001000000001001000010
+0100001001000000001001000010
+0111111001000000001001111110
+0100001001000000001001000010
+0100001001000000001001000010
+0111001001111111111001001110
+0001001001000000001001001000
+0001001001000000001001001000
+0111111111111111111111111110
+0100001000001001000001000010
+0100001000001001000001000010
+0111001111111001111111001110
+0001001001000000001001001000
+0001001001000000001001001000
+0111111001111001111001111110
+0100001000001001000001000010
+0100001000001001000001000010
+0111111111111111111111111110
+0000000000000000000000000000";
 
-						// adjust adjcent tile counts of each tile
-						newTile.adjacentCount++;
-						tiles[tiles.Count-1].adjacentCount++;
-					}
-				}
-				
-				// if the current tile is not movable
-				else   newTile.occupied = true;
-				
-				// check for up-down neighbor, starting from second row (Y<30)
-				int upNeighbor = tiles.Count - line.Length;  // up neighbor index
-				if(Y < 30 && !newTile.occupied && !tiles[upNeighbor].occupied)
-				{
-					tiles[upNeighbor].down = newTile;
-					newTile.up = tiles[upNeighbor];
+        int X = 1, Y = 31;
+        using (StringReader reader = new StringReader(data))
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
 
-					// adjust adjcent tile counts of each tile
-					newTile.adjacentCount++;
-					tiles[upNeighbor].adjacentCount++;
-				}
-				
-				tiles.Add(newTile);
-				X++;
-			}
-			
-			Y--;
-			//Debug.Log ("----------");
-		}
+                X = 1; // for every line
+                for (int i = 0; i < line.Length; ++i)
+                {
+                    Tile newTile = new Tile(X, Y);
 
-		// after reading all tiles, determine the intersection tiles
-		foreach(Tile tile in tiles)
-		{
-			if(tile.adjacentCount > 2)
-				tile.isIntersection = true;
-		}
+                    // if the tile we read is a valid tile (movable)
+                    if (line[i] == '1')
+                    {
+                        // check for left-right neighbor
+                        if (i != 0 && line[i - 1] == '1')
+                        {
+                            // assign each tile to the corresponding side of other tile
+                            newTile.left = tiles[tiles.Count - 1];
+                            tiles[tiles.Count - 1].right = newTile;
 
-		stream.Close();
-	}
-	
-	
+                            // adjust adjcent tile counts of each tile
+                            newTile.adjacentCount++;
+                            tiles[tiles.Count - 1].adjacentCount++;
+                        }
+                    }
+
+                    // if the current tile is not movable
+                    else newTile.occupied = true;
+
+                    // check for up-down neighbor, starting from second row (Y<30)
+                    int upNeighbor = tiles.Count - line.Length; // up neighbor index
+                    if (Y < 30 && !newTile.occupied && !tiles[upNeighbor].occupied)
+                    {
+                        tiles[upNeighbor].down = newTile;
+                        newTile.up = tiles[upNeighbor];
+
+                        // adjust adjcent tile counts of each tile
+                        newTile.adjacentCount++;
+                        tiles[upNeighbor].adjacentCount++;
+                    }
+
+                    tiles.Add(newTile);
+                    X++;
+                }
+
+                Y--;
+            }
+        }
+
+        // after reading all tiles, determine the intersection tiles
+        foreach (Tile tile in tiles)
+        {
+            if (tile.adjacentCount > 2)
+                tile.isIntersection = true;
+        }
+
+    }
+
 	//-----------------------------------------------------------------------
 	// Draw lines between neighbor tiles (debug)
 	void DrawNeighbors()
@@ -144,15 +170,12 @@ public class TileManager : MonoBehaviour {
 
 		// else, if the requested index is out of bounds
 		// return closest in-bounds tile's index 
-		else
-		{
-			if(X<1)		X = 1;
-			if(X>28) 	X = 28;
-			if(Y<1)		Y = 1;
-			if(Y>31)	Y = 31;
+	    if(X<1)		X = 1;
+	    if(X>28) 	X = 28;
+	    if(Y<1)		Y = 1;
+	    if(Y>31)	Y = 31;
 
-			return (31-Y)*28 + X-1;
-		}
+	    return (31-Y)*28 + X-1;
 	}
 	
 	public int Index(Tile tile)

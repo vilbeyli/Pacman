@@ -116,86 +116,150 @@ public class GhostMove : MonoBehaviour {
         timeToEndWait = Time.time + waitLength + GUINav.initialDelay;
         InitializeWaypoints(state);
     }
+	
 
-	void InitializeWaypoints(State st)
-	{
-		//-----------------
-		// File Format: Init and Scatter coordinates separated by empty line
-		// Init X,Y 
-		// Init X,Y
-		// 
-		// Scatter X,Y
-		// Scatter X,Y
+    private void InitializeWaypoints(State st)
+    {
+        //--------------------------------------------------
+        // File Format: Init and Scatter coordinates separated by empty line
+        // Init X,Y 
+        // Init X,Y
+        // 
+        // Scatter X,Y
+        // Scatter X,Y
 
-		string path = Application.dataPath + "/Data/" + transform.name + "_wps.txt";
-		StreamReader stream = new StreamReader(path);
+        //--------------------------------------------------
+        // hardcode waypoints according to name.
+        string data = "";
+        switch (name)
+        {
+        case "blinky":
+            data = @"22 20
+22 26
 
-		waypoints = new Queue<Vector3>();
-		Vector3 wp;
+27 26
+27 30
+22 30
+22 26";
+            break;
+        case "pinky":
+            data = @"14.5 17
+14 17
+14 20
+7 20
 
-		if(st == State.Init)
-		{ 
-			while(!stream.EndOfStream)
-			{
-				// stop reading if empty line is reached
-				string line = stream.ReadLine();
-				if(line.Length == 0) 	break;
+7 26
+7 30
+2 30
+2 26";
+            break;
+        case "inky":
+            data = @"16.5 17
+15 17
+15 20
+22 20
 
-				string[] values = line.Split(' ');
-				float x = float.Parse(values[0]);
-				float y = float.Parse(values[1]);
+22 8
+19 8
+19 5
+16 5
+16 2
+27 2
+27 5
+22 5";
+            break;
+        case "clyde":
+            data = @"12.5 17
+14 17
+14 20
+7 20
 
-				wp = new Vector3(x,y,0);
-				waypoints.Enqueue(wp);
-			}
-		}
+7 8
+7 5
+2 5
+2 2
+13 2
+13 5
+10 5
+10 8";
+            break;
+        
+        }
 
-		if(st == State.Scatter)
-		{
-			// skip until empty line is reached, read coordinates afterwards
-			bool scatterWps = false;	// Scatter waypoints
-			while(!stream.EndOfStream)
-			{
-				string line = stream.ReadLine();
-				if(line.Length == 0)
-				{
-					scatterWps = true;	// we reached the scatter waypoints
-					continue;	// do not read empty line, go to next line
-				}
+        //-------------------------------------------------
+        // read from the hardcoded waypoints
+        string line;
 
-				if(scatterWps)
-				{
-					string[] values = line.Split(' ');
-					int x = Int32.Parse(values[0]);
-					int y = Int32.Parse(values[1]);
-					
-					wp = new Vector3(x,y,0);
-					waypoints.Enqueue(wp);
-				}
-			}
-		}
+        waypoints = new Queue<Vector3>();
+        Vector3 wp;
 
-		// if in wait state, patrol vertically
-		if(st == State.Wait)
-		{
-			Vector3 pos = transform.position;
+        if (st == State.Init)
+        {
+            using (StringReader reader = new StringReader(data))
+            {
+                // stop reading if empty line is reached
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Length == 0) break; // DOES IT WORK????
 
-			// inky and clyde start going down and then up
-			if(transform.name == "inky" || transform.name == "clyde")
-			{
-				waypoints.Enqueue(new Vector3(pos.x, pos.y-0.5f, 0f));
-				waypoints.Enqueue(new Vector3(pos.x, pos.y+0.5f, 0f));
-			}
-			// while pinky start going up and then down
-			else
-			{
-				waypoints.Enqueue(new Vector3(pos.x, pos.y+0.5f, 0f));
-				waypoints.Enqueue(new Vector3(pos.x, pos.y-0.5f, 0f));
-			}
-		}
+                    string[] values = line.Split(' ');
+                    float x = float.Parse(values[0]);
+                    float y = float.Parse(values[1]);
 
-		stream.Close();
-	}
+                    wp = new Vector3(x, y, 0);
+                    waypoints.Enqueue(wp);
+                }
+            }
+        }
+
+        if (st == State.Scatter)
+        {
+            // skip until empty line is reached, read coordinates afterwards
+            bool scatterWps = false;	// Scatter waypoints
+
+            using (StringReader reader = new StringReader(data))
+            {
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Length == 0)
+                    {
+                        scatterWps = true; // we reached the scatter waypoints
+                        continue; // do not read empty line, go to next line
+                    }
+
+                    if (scatterWps)
+                    {
+                        string[] values = line.Split(' ');
+                        int x = Int32.Parse(values[0]);
+                        int y = Int32.Parse(values[1]);
+
+                        wp = new Vector3(x, y, 0);
+                        waypoints.Enqueue(wp);
+                    }
+                }
+            }
+        }
+
+        // if in wait state, patrol vertically
+        if (st == State.Wait)
+        {
+            Vector3 pos = transform.position;
+
+            // inky and clyde start going down and then up
+            if (transform.name == "inky" || transform.name == "clyde")
+            {
+                waypoints.Enqueue(new Vector3(pos.x, pos.y - 0.5f, 0f));
+                waypoints.Enqueue(new Vector3(pos.x, pos.y + 0.5f, 0f));
+            }
+            // while pinky start going up and then down
+            else
+            {
+                waypoints.Enqueue(new Vector3(pos.x, pos.y + 0.5f, 0f));
+                waypoints.Enqueue(new Vector3(pos.x, pos.y - 0.5f, 0f));
+            }
+        }
+
+    }
 
     private Vector3 getStartPosAccordingToName()
     {
