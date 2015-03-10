@@ -5,8 +5,9 @@ using System.Collections;
 public class PlayerController : MonoBehaviour {
 
 	public float speed = 0.4f;
-	Vector2 dest = Vector2.zero;
-	Vector2 dir = Vector2.right;
+	Vector2 _dest = Vector2.zero;
+	Vector2 _dir = Vector2.zero;
+    Vector2 _nextDir = Vector2.zero;
 
     [Serializable]
     public class PointSprites
@@ -23,7 +24,7 @@ public class PlayerController : MonoBehaviour {
 	private GameManager GM;
     private ScoreManager SM;
 
-	private bool deadPlaying = false;
+	private bool _deadPlaying = false;
 
 	// Use this for initialization
 	void Start () 
@@ -31,7 +32,7 @@ public class PlayerController : MonoBehaviour {
 		GM = GameObject.Find ("Game Manager").GetComponent<GameManager>();
 	    SM = GameObject.Find("Game Manager").GetComponent<ScoreManager>();
 		GUINav = GameObject.Find ("UI Manager").GetComponent<GameGUINavigation>();
-		dest = transform.position;
+		_dest = transform.position;
 	}
 	
 	// Update is called once per frame
@@ -40,12 +41,12 @@ public class PlayerController : MonoBehaviour {
 		switch(GameManager.gameState)
 		{
 		case GameManager.GameState.Game:
-			readInputAndMove();
-			animate ();
+			ReadInputAndMove();
+			Animate ();
 			break;
 
 		case GameManager.GameState.Dead:
-			if(!deadPlaying)	
+			if(!_deadPlaying)	
 				StartCoroutine("PlayDeadAnimation");
 			break;
 		}
@@ -55,11 +56,11 @@ public class PlayerController : MonoBehaviour {
 
 	IEnumerator PlayDeadAnimation()
 	{
-		deadPlaying = true;
+		_deadPlaying = true;
 		GetComponent<Animator>().SetBool("Die", true);
 		yield return new WaitForSeconds(1);
 		GetComponent<Animator>().SetBool("Die", false);
-		deadPlaying = false;
+		_deadPlaying = false;
 
 	    if (GameManager.lives <= 0)
 	    {
@@ -74,64 +75,65 @@ public class PlayerController : MonoBehaviour {
             GM.ResetScene();
 	}
 
-	void animate()
+	void Animate()
 	{
-		Vector2 dir = dest - (Vector2)transform.position;
+		Vector2 dir = _dest - (Vector2)transform.position;
 		GetComponent<Animator>().SetFloat("DirX", dir.x);
 		GetComponent<Animator>().SetFloat("DirY", dir.y);
 	}
 
-	bool valid(Vector2 dir)
+	bool Valid(Vector2 direction)
 	{
 		// cast line from 'next to pacman' to pacman
-		Vector2 pos = transform.position;
-		RaycastHit2D hit = Physics2D.Linecast(pos+dir, pos);
-		return hit.collider.name == "pacdot" || (hit.collider == collider2D);
+        // not from directly the center of next tile but just a little further from center of next tile
+        Vector2 pos = transform.position;
+        direction += new Vector2(direction.x * 0.45f, direction.y * 0.45f); 
+        RaycastHit2D hit = Physics2D.Linecast(pos + direction, pos);
+		return hit.collider.name == "pacdot" || (hit.collider == GetComponent<Collider2D>());
 	}
 
-	public void resetDestination()
+	public void ResetDestination()
 	{
-		dest = new Vector2(15f, 11f);
+		_dest = new Vector2(15f, 11f);
 		GetComponent<Animator>().SetFloat("DirX", 1);
 		GetComponent<Animator>().SetFloat("DirY", 0);
 	}
 
-	void readInputAndMove()
+	void ReadInputAndMove()
 	{
 		// move closer to destination
-		Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
-		rigidbody2D.MovePosition(p);
-		
-		// Check for Input if not moving
-		if ((Vector2)transform.position == dest) {
-			if (Input.GetKey(KeyCode.UpArrow) && valid(Vector2.up))
-			{
-				dest = (Vector2)transform.position + Vector2.up;
-				dir = Vector2.up;
-			}
-			if (Input.GetKey(KeyCode.RightArrow) && valid(Vector2.right))
-			{
-				dest = (Vector2)transform.position + Vector2.right;
-				dir = Vector2.right;
-			}
-			if (Input.GetKey(KeyCode.DownArrow) && valid(-Vector2.up))
-			{
-				dest = (Vector2)transform.position - Vector2.up;
-				dir = -Vector2.up;
-			}
-			if (Input.GetKey(KeyCode.LeftArrow) && valid(-Vector2.right))
-			{
-				dest = (Vector2)transform.position - Vector2.right;
-				dir = -Vector2.right;
-			}
-		}
+		Vector2 p = Vector2.MoveTowards(transform.position, _dest, speed);
+		GetComponent<Rigidbody2D>().MovePosition(p);
+
+        // get the next direction from keyboard
+	    if (Input.GetKey("right"))  _nextDir = Vector2.right;
+	    if (Input.GetKey("left"))   _nextDir = -Vector2.right;
+	    if (Input.GetKey("up"))     _nextDir = Vector2.up;
+	    if (Input.GetKey("down"))   _nextDir = -Vector2.up;
+        
+        // if pacman is in the center of a tile
+	    if(Vector2.Distance(_dest, transform.position) < 0.00001f)
+        {
+            if (Valid(_nextDir)) 
+            {
+                _dest = (Vector2)transform.position + _nextDir;
+                _dir = _nextDir;
+            }
+            else   // if next direction is not valid
+            {
+                if(Valid(_dir))  // and the prev. direction is valid
+                    _dest = (Vector2)transform.position + _dir;   // continue on that direction
+              
+                // otherwise, do nothing
+            }
+	    }
 	}
 
 	public Vector2 getDir()
 	{
-		return dir;
+		return _dir;
 	}
-
+    
     public void UpdateScore()
     {
         killstreak++;

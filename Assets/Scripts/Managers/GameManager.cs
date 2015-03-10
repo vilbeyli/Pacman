@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour {
 		inky.transform.position = new Vector3(16.5f, 17f, 0f);
 		clyde.transform.position = new Vector3(12.5f, 17f, 0f);
 
-		pacman.GetComponent<PlayerController>().resetDestination();
+		pacman.GetComponent<PlayerController>().ResetDestination();
 		blinky.GetComponent<GhostMove>().InitializeGhost();
 		pinky.GetComponent<GhostMove>().InitializeGhost();
 		inky.GetComponent<GhostMove>().InitializeGhost();
