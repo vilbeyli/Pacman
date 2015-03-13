@@ -373,7 +373,7 @@ public class GhostMove : MonoBehaviour {
         if (Vector3.Distance(transform.position, waypoint) > 0.000000000001)
 		{
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
-			GetComponent<Rigidbody2D>().MovePosition(p);
+			rigidbody2D.MovePosition(p);
 		}
 
 		// if at waypoint, run AI module
@@ -391,7 +391,7 @@ public class GhostMove : MonoBehaviour {
         if (Vector3.Distance(transform.position, waypoint) > 0.000000000001)
 		{
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
-			GetComponent<Rigidbody2D>().MovePosition(p);
+			rigidbody2D.MovePosition(p);
 		}
 		
 		// if at waypoint, run AI run away logic
@@ -408,7 +408,7 @@ public class GhostMove : MonoBehaviour {
 		{									                        // move towards it
 			_direction = Vector3.Normalize(waypoint - transform.position);	// dont screw up waypoint by calling public setter
 			Vector2 p = Vector2.MoveTowards(transform.position, waypoint, speed);
-			GetComponent<Rigidbody2D>().MovePosition(p);
+			rigidbody2D.MovePosition(p);
 		}
 		else 	// if waypoint is reached, remove it from the queue
 		{
