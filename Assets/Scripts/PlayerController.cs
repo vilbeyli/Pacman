@@ -107,10 +107,10 @@ public class PlayerController : MonoBehaviour
         GetComponent<Rigidbody2D>().MovePosition(p);
 
         // get the next direction from keyboard
-        if (Input.GetKey("right")) _nextDir = Vector2.right;
-        if (Input.GetKey("left")) _nextDir = -Vector2.right;
-        if (Input.GetKey("up")) _nextDir = Vector2.up;
-        if (Input.GetKey("down")) _nextDir = -Vector2.up;
+        if (Input.GetAxis("Horizontal") > 0) _nextDir = Vector2.right;
+        if (Input.GetAxis("Horizontal") < 0) _nextDir = -Vector2.right;
+        if (Input.GetAxis("Vertical") > 0) _nextDir = Vector2.up;
+        if (Input.GetAxis("Vertical") < 0) _nextDir = -Vector2.up;
 
         // if pacman is in the center of a tile
         if (Vector2.Distance(_dest, transform.position) < 0.00001f)
