@@ -5,7 +5,9 @@ A Pacman clone made in Unity3D, with tutorials from [noobtuts](http://noobtuts.c
 
 You can [visit my next project](https://github.com/vilbeyli/Minesweeper), or
 
+**[Play Pacman on Web!](http://vilbeyli.github.io/Pacman/)**
+
 ![Screenshot](http://i.imgur.com/GQcmfQY.png)
 
 
-#**[Play Pacman on Web!](http://vilbeyli.github.io/Pacman/)**
+
