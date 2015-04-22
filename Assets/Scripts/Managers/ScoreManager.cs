@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour {
 
-    private string TopScoresURL = "http://ilbeyli.byethost18.com/topscores.php";
+    private string TopScoresURL = "http://ilbeyli.byethost18.com/pacman/topscores.php";
     private string username;
     private int _highscore;
     private int _lowestHigh;
@@ -36,9 +36,8 @@ public class ScoreManager : MonoBehaviour {
     {
         StartCoroutine("ReadScoresFromDB");
 
-        // if high scores level is loaded, populate the screen
-        if (level == 2) StartCoroutine("UpdateGUIText");
-        if (level == 1) StartCoroutine("GetHighestScore");
+        if (level == 2) StartCoroutine("UpdateGUIText");    // if scores is loaded
+        if (level == 1) StartCoroutine("GetHighestScore");  // if game is loaded
     }
 
     IEnumerator GetHighestScore()
@@ -54,7 +53,6 @@ public class ScoreManager : MonoBehaviour {
                 Debug.Log("Timed out");
                 scoreList.Clear();
                 scoreList.Add(new Score("DATABASE CONNECTION TIMED OUT", 0));
-                scoreList.Add(new Score("DATABASE CONNECTION TIMED OUT", 99999998));
                 break;
             }
         }
@@ -71,9 +69,10 @@ public class ScoreManager : MonoBehaviour {
         {
             yield return new WaitForSeconds(0.01f);
             if (Time.time > timeOut)
-            {
+            {   
+                Debug.Log("TIMEOUT!");
                 scoreList.Clear();
-                scoreList.Add(new Score("DATABASE CONNECTION TIMED OUT", 0));
+                scoreList.Add(new Score("DATABASE CONNECTION TIMED OUT", 99999));
                 break;
             }
         }
@@ -92,17 +91,19 @@ public class ScoreManager : MonoBehaviour {
         }
         else
         {
+            // ATTENTION: assumes query will find table
             string[] textlist = GetScoresAttempt.text.Split(new string[] { "\n", "\t" },
                 StringSplitOptions.RemoveEmptyEntries);
 
             string[] Names = new string[Mathf.FloorToInt(textlist.Length / 2)];
             string[] Scores = new string[Names.Length];
 
+            //Debug.Log("Textlist length: " + textlist.Length + " DATA: " + textlist[0]);
             for (int i = 0; i < textlist.Length; i++)
             {
                 if (i % 2 == 0)
                 {
-                    Names[Mathf.FloorToInt(i / 2)] = textlist[i];
+                    Names[Mathf.FloorToInt(i/2)] = textlist[i];
                 }
                 else Scores[Mathf.FloorToInt(i / 2)] = textlist[i];
             }
@@ -115,42 +116,6 @@ public class ScoreManager : MonoBehaviour {
             _scoresRead = true;
         }
 
-    }
-
-    private void ReadScoresFromFile()
-    {
-        // read scores from file
-        string path = Application.dataPath + "/Data/scores.txt";
-        StreamReader stream = new StreamReader(path);
-
-        while (!stream.EndOfStream)
-        {
-            string line = stream.ReadLine();
-            string[] values = line.Split(' ');
-            scoreList.Add(new Score(values[1], Int32.Parse(values[0])));
-        }
-
-        stream.Close();
-
-    }
-
-    // reads highest score from file
-    static public int F_High()
-    {
-
-        // open file
-        string path = Application.dataPath + "/Data/scores.txt";
-        StreamReader stream = new StreamReader(path);
-
-        // read first line and split
-        string line = stream.ReadLine();
-        string[] values = line.Split(' ');
-
-        // close file
-        stream.Close();
-
-        // parse the first value as the highest score
-        return Int32.Parse(values[0]);
     }
 
     public int High()

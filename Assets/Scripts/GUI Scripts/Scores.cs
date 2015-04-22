@@ -16,6 +16,7 @@ public class Scores : MonoBehaviour
 
     public void UpdateGUIText(List<ScoreManager.Score> scoreList)
     {
+        Debug.Log("Updating GUIText: scorelist count=" + scoreList.Count);
         string s = "";
         foreach (ScoreManager.Score sc in scoreList)
         {
