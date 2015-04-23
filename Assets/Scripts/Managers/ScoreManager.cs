@@ -11,6 +11,7 @@ public class ScoreManager : MonoBehaviour {
     private int _highscore;
     private int _lowestHigh;
     private bool _scoresRead;
+    private bool _isTableFound;
 
     public class Score
     {
@@ -44,15 +45,15 @@ public class ScoreManager : MonoBehaviour {
     {
         Debug.Log("GETTING HIGHEST SCORE");
         // wait until scores are pulled from database
-        float timeOut = Time.time + 2;
+        float timeOut = Time.time + 4;
         while (!_scoresRead)
         {
             yield return new WaitForSeconds(0.01f);
             if (Time.time > timeOut)
             {
                 Debug.Log("Timed out");
-                scoreList.Clear();
-                scoreList.Add(new Score("DATABASE CONNECTION TIMED OUT", 0));
+                //scoreList.Clear();
+                //scoreList.Add(new Score("GetHighestScore:: DATABASE CONNECTION TIMED OUT", -1));
                 break;
             }
         }
@@ -64,18 +65,19 @@ public class ScoreManager : MonoBehaviour {
     IEnumerator UpdateGUIText()
     {
         // wait until scores are pulled from database
-        float timeOut = Time.time + 2;
+        float timeOut = Time.time + 4;
         while (!_scoresRead)
         {
             yield return new WaitForSeconds(0.01f);
             if (Time.time > timeOut)
             {   
                 Debug.Log("TIMEOUT!");
-                scoreList.Clear();
-                scoreList.Add(new Score("DATABASE CONNECTION TIMED OUT", 99999));
+                //scoreList.Clear();
+                //scoreList.Add(new Score("UpdateGUIText:: DATABASE CONNECTION TIMED OUT", 1));
                 break;
             }
         }
+
 
         GameObject.FindGameObjectWithTag("ScoresText").GetComponent<Scores>().UpdateGUIText(scoreList);
     }
@@ -88,32 +90,47 @@ public class ScoreManager : MonoBehaviour {
         if (GetScoresAttempt.error != null)
         {
             Debug.Log(string.Format("ERROR GETTING SCORES: {0}", GetScoresAttempt.error));
+            scoreList.Add(new Score(GetScoresAttempt.error, 1234));
+            StartCoroutine(UpdateGUIText());
         }
         else
         {
             // ATTENTION: assumes query will find table
+
             string[] textlist = GetScoresAttempt.text.Split(new string[] { "\n", "\t" },
                 StringSplitOptions.RemoveEmptyEntries);
 
-            string[] Names = new string[Mathf.FloorToInt(textlist.Length / 2)];
-            string[] Scores = new string[Names.Length];
-
-            //Debug.Log("Textlist length: " + textlist.Length + " DATA: " + textlist[0]);
-            for (int i = 0; i < textlist.Length; i++)
+            if (textlist.Length == 1)
             {
-                if (i % 2 == 0)
+                Debug.Log("== 1");
+                scoreList.Clear();
+                scoreList.Add(new Score(textlist[0], -123));
+                yield return null;
+            }
+            else
+            {
+
+
+                string[] Names = new string[Mathf.FloorToInt(textlist.Length/2)];
+                string[] Scores = new string[Names.Length];
+
+                //Debug.Log("Textlist length: " + textlist.Length + " DATA: " + textlist[0]);
+                for (int i = 0; i < textlist.Length; i++)
                 {
-                    Names[Mathf.FloorToInt(i/2)] = textlist[i];
+                    if (i%2 == 0)
+                    {
+                        Names[Mathf.FloorToInt(i/2)] = textlist[i];
+                    }
+                    else Scores[Mathf.FloorToInt(i/2)] = textlist[i];
                 }
-                else Scores[Mathf.FloorToInt(i / 2)] = textlist[i];
-            }
 
-            for (int i = 0; i < Names.Length; i++)
-            {
-                scoreList.Add(new Score(Names[i], Scores[i]));
-            }
+                for (int i = 0; i < Names.Length; i++)
+                {
+                    scoreList.Add(new Score(Names[i], Scores[i]));
+                }
 
-            _scoresRead = true;
+                _scoresRead = true;
+            }
         }
 
     }
