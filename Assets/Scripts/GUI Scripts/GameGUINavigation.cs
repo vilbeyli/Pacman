@@ -116,21 +116,24 @@ public class GameGUINavigation : MonoBehaviour {
 			_paused = true;
 			MenuButton.enabled = false;
 		}
+
+
+        Debug.Log("PauseCanvas enabled: " + PauseCanvas.enabled);
 	}
 	
 	public void ToggleQuit()
 	{
 		if(quit)
-		{
-			PauseCanvas.enabled = true;
-			QuitCanvas.enabled = false;
+        {
+            PauseCanvas.enabled = true;
+            QuitCanvas.enabled = false;
 			quit = false;
 		}
 		
 		else
-		{
+        {
+            QuitCanvas.enabled = true;
 			PauseCanvas.enabled = false;
-			QuitCanvas.enabled = true;
 			quit = true;
 		}
 	}
