@@ -35,10 +35,11 @@ public class ScoreManager : MonoBehaviour {
 
     void OnLevelWasLoaded(int level)
     {
-        StartCoroutine("ReadScoresFromDB");
+        //StartCoroutine("ReadScoresFromDB");
 
         if (level == 2) StartCoroutine("UpdateGUIText");    // if scores is loaded
-        if (level == 1) StartCoroutine("GetHighestScore");  // if game is loaded
+        if (level == 1) _lowestHigh = _highscore = 99999;
+        //if (level == 1) StartCoroutine("GetHighestScore");  // if game is loaded
     }
 
     IEnumerator GetHighestScore()
@@ -64,6 +65,7 @@ public class ScoreManager : MonoBehaviour {
 
     IEnumerator UpdateGUIText()
     {
+        /*
         // wait until scores are pulled from database
         float timeOut = Time.time + 4;
         while (!_scoresRead)
@@ -71,15 +73,18 @@ public class ScoreManager : MonoBehaviour {
             yield return new WaitForSeconds(0.01f);
             if (Time.time > timeOut)
             {   
-                Debug.Log("TIMEOUT!");
-                //scoreList.Clear();
-                //scoreList.Add(new Score("UpdateGUIText:: DATABASE CONNECTION TIMED OUT", 1));
+                //Debug.Log("TIMEOUT!");
+                scoreList.Clear();
+                scoreList.Add(new Score("DATABASE TEMPORARILY UNAVAILABLE", 999999));
                 break;
             }
         }
-
+        */
+        scoreList.Clear();
+        scoreList.Add(new Score("DATABASE TEMPORARILY UNAVAILABLE", 999999));
 
         GameObject.FindGameObjectWithTag("ScoresText").GetComponent<Scores>().UpdateGUIText(scoreList);
+        yield return new WaitForSeconds(0f);
     }
 
     IEnumerator ReadScoresFromDB()
@@ -102,7 +107,7 @@ public class ScoreManager : MonoBehaviour {
 
             if (textlist.Length == 1)
             {
-                Debug.Log("== 1");
+                //`Debug.Log("== 1");
                 scoreList.Clear();
                 scoreList.Add(new Score(textlist[0], -123));
                 yield return null;

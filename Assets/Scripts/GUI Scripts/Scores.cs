@@ -8,14 +8,9 @@ public class Scores : MonoBehaviour
 
     Text scores_txt;
 
-    private void Start()
-    {
-        // get text handle
-        scores_txt = GetComponent<Text>();
-    }
-
     public void UpdateGUIText(List<ScoreManager.Score> scoreList)
     {
+        scores_txt = GetComponent<Text>();
         Debug.Log("Updating GUIText: scorelist count=" + scoreList.Count);
         string s = "";
         foreach (ScoreManager.Score sc in scoreList)
